@@ -1,0 +1,40 @@
+# ===========================================================================
+#  voice.cmds  -  starpOS voice command registry
+# ===========================================================================
+#  Every phrase the voice engine listens for. voice.ps1 builds its speech
+#  recognition grammar straight out of this file, so adding a new spoken
+#  command means adding one line here. No code to change.
+#
+#  FORMAT:  phrase|action|target|spoken reply
+#
+#    phrase  what you say. Keep it short, two or three words recognise best.
+#    action  say   - just speak the reply
+#            run   - speak the reply, then launch target
+#            show  - speak the reply, then print the text file in target
+#            list  - speak the reply, then list the folder in target
+#            exit  - speak the reply, then close the voice engine
+#    target  the file or folder the action needs, or blank for say and exit
+#    reply   what starpOS speaks back
+#
+#  Phrases are matched without case. Do not use the | character in a reply.
+# ===========================================================================
+
+starpOS|say||Yes Boss. I am listening. All starp O S core systems are online.
+hello|say||Hello. starp O S is running and ready for your instructions.
+who are you|say||I am starp O S, built by the Scott Soft team.
+what time is it|say||Check the desktop header. The clock is in the top bar.
+
+open file|list|..|Opening file explorer.
+open system|list|.|Listing the system folder.
+show help|show|help.txt|Opening the help screen.
+show errors|show|errors.txt|Opening the error code reference.
+show notes|list|..\data\notes|Listing your saved notes.
+
+system info|run|sysinfo.ps1|Reading the real machine specifications.
+open desktop|run|startup.bat|Returning to the starp O S desktop.
+open movies|run|movies.bat|Opening the movie theater.
+open usb|run|usb.bat|Opening the U S B device controller.
+task manager|run|tasklist|Listing the running processes.
+
+exit|exit||Exiting voice control system.
+shut down|exit||Shutting down the voice engine. Goodbye.

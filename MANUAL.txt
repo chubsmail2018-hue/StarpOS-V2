@@ -1,0 +1,411 @@
+===============================================================================
+                     starpOS SYSTEM FILE MANUAL  (v1.3.0)
+===============================================================================
+
+ This folder now holds a set of system files that sit UNDERNEATH the batch
+ scripts. None of them run on their own and none of them are .bat, so the
+ kernel's "run every .bat in the system folder" scan at boot ignores them
+ completely. Nothing about the current boot works differently until you
+ choose to wire one in.
+
+ The idea: stop hard-coding the OS name, version, colours, passwords and
+ file paths inside twelve different batch files. Put them in one place, and
+ have the batch files read them.
+
+
+-------------------------------------------------------------------------------
+ THE FILES
+-------------------------------------------------------------------------------
+
+ starpos.cfg    Master settings. OS name, version, folder paths, log stream
+                targets, boot options, theme colours, voice options, which
+                app each menu slot launches. One KEY=VALUE per line.
+
+ users.db       Account registry. username|password|role|theme|display name.
+                Ships with Admin/1234 (the same default startup2.bat already
+                uses), plus Scott and a Guest account.
+
+ apps.reg       The index of every program in starpOS: which are part of the
+                boot chain, which are apps, which are tools, and what each
+                one actually does.
+
+ logo.txt       The ASCII starpOS banner. Because it is a text file and not
+                an echo line, batch never mangles the slashes and pipes in
+                the artwork. Print it with:  type logo.txt
+
+ motd.txt       Message of the day for the desktop.
+
+ help.txt       The in-OS help screen.
+
+ errors.txt     Every STARP-#### error code and what to do about it.
+
+ version.txt    Build number, per-component versions, change history.
+
+ speak.vbs      Shared speech engine. Replaces the write-temp-vbs / run /
+                delete block that is currently copy-pasted into every script.
+
+ sysinfo.ps1    Real system information: actual CPU, RAM, disks, uptime and
+                graphics, plus the starpOS identity read out of starpos.cfg.
+
+ menu.cfg       What appears on the desktop and what each item runs.
+                startup.bat both draws AND dispatches from this file, so an
+                app can be added to the desktop without writing batch code.
+
+ setcfg.ps1     Writes a setting back into starpos.cfg. This is the piece
+                that makes a theme survive a reboot.
+
+ logview.ps1    Reads the three log streams from inside the OS and colours
+                each line by its tag.
+
+ calc.ps1       Calculator, with history and an 'ans' key.
+
+ voice.cmds     Every phrase the voice engine listens for, and what each
+                one does. Add a line, get a new spoken command.
+
+ voicebank.txt  Every line starpOS speaks, looked up by ID. Change the
+                wording here and the whole OS changes with it.
+
+ listen.vbs     Pop-up input box that prints what was typed, so a batch
+                file can capture an answer without a temp script.
+
+ scan.ps1       DEV. Read-only deep check of every file and every batch
+                jump. Finds the faults, fixes nothing.
+
+ repair.ps1     DEV. Fixes what scan.ps1 found, backing up first.
+
+ logedit.ps1    DEV. The writable log tool: search, trim, delete, wipe.
+
+ mkapp.ps1      DEV. Writes a working app and puts it on the desktop.
+
+ install.ps1    DEV. Registers existing programs, folders and websites,
+                removes apps, and can hand a package to winget.
+
+
+-------------------------------------------------------------------------------
+ TRY THEM RIGHT NOW
+-------------------------------------------------------------------------------
+
+ Open a command prompt in the system folder and run:
+
+     type logo.txt
+     type help.txt
+     cscript //nologo speak.vbs "starp O S system files installed."
+     powershell -NoProfile -ExecutionPolicy Bypass -File sysinfo.ps1
+
+ Look up one error code:
+
+     findstr /b "STARP-0301" errors.txt
+
+
+-------------------------------------------------------------------------------
+ WIRING THEM INTO THE BATCH FILES
+-------------------------------------------------------------------------------
+
+ These are the exact lines to paste when you want a script to start using a
+ system file. Nothing here has been added to your .bat files for you.
+
+
+ 1. LOAD EVERY SETTING  (good first line for bootcore.bat)
+
+     for /f "usebackq eol=# tokens=1,2 delims==" %%A in ("starpos.cfg") do (
+         set "%%A=%%B"
+     )
+
+    After that line %OS_NAME%, %OS_VERSION%, %LOG_KERNEL%, %THEME_DESKTOP%
+    and every other key in the file are live environment variables.
+
+
+ 2. READ ONE SETTING ONLY
+
+     for /f "usebackq eol=# tokens=2 delims==" %%A in (`findstr "^OS_VERSION=" starpos.cfg`) do (
+         set "OS_VERSION=%%A"
+     )
+
+
+ 3. PRINT THE BANNER  (replaces the broken ASCII art block in startup2.bat)
+
+     if exist "logo.txt" (type logo.txt) else (echo    %OS_NAME%)
+
+
+ 4. SHOW THE MESSAGE OF THE DAY
+
+     if exist "motd.txt" type motd.txt
+
+
+ 5. SPEAK  (replaces the four-line temp-vbs block everywhere)
+
+    Old:
+        echo CreateObject("SAPI.SpVoice").Speak "Hello." > "%temp%\talk.vbs"
+        cscript //nologo "%temp%\talk.vbs"
+        del "%temp%\talk.vbs"
+
+    New:
+        cscript //nologo "speak.vbs" "Hello."
+
+    Respecting the VOICE_ENABLED switch in starpos.cfg:
+
+        if "%VOICE_ENABLED%"=="1" cscript //nologo "speak.vbs" "Hello."
+
+
+ 6. CHECK A LOGIN AGAINST users.db  (for the portal in startup2.bat)
+
+     set "AUTH_OK="
+     set "OS_ROLE="
+     for /f "usebackq eol=# tokens=1,2,3,4,5 delims=|" %%A in ("users.db") do (
+         if /I "%%A"=="%input_user%" if "%%B"=="%input_pass%" (
+             set "AUTH_OK=1"
+             set "OS_ROLE=%%C"
+             set "OS_THEME=%%D"
+             set "OS_FULLNAME=%%E"
+         )
+     )
+     if not defined AUTH_OK goto bad_login
+
+
+ 7. ADD A NEW ACCOUNT, SAVED FOR NEXT BOOT
+
+     echo %new_user%^|%new_pass%^|user^|1F^|%new_user%>>"users.db"
+
+    That single line is the piece startup2.bat is missing today: accounts it
+    creates only live until the window closes, because they are set as
+    environment variables and never written to disk.
+
+
+ 8. BUILD THE DESKTOP MENU FROM apps.reg
+
+     for /f "usebackq eol=# tokens=1,2 delims=|" %%A in ("apps.reg") do (
+         if not "%%A"=="-" echo    %%A. %%B
+     )
+
+
+ 9. SHOW HELP FROM THE DESKTOP
+
+     if exist "help.txt" (type help.txt & pause)
+
+
+ 10. EXPLAIN AN ERROR CODE TO THE USER
+
+     findstr /b "STARP-0401" errors.txt
+
+
+ 11. REAL SYSTEM INFO INSTEAD OF THE FAKE BLOCK
+
+     powershell -NoProfile -ExecutionPolicy Bypass -File "sysinfo.ps1"
+
+    Or log it during boot without stopping for a keypress:
+
+     powershell -NoProfile -ExecutionPolicy Bypass -File "sysinfo.ps1" -NoPause -Log "..\data\1.log"
+
+
+-------------------------------------------------------------------------------
+ THE DESKTOP MENU
+-------------------------------------------------------------------------------
+
+ startup.bat v2.0 no longer has its menu written into the code. It reads
+ menu.cfg, draws whatever it finds, and dispatches from the same lines.
+
+     slot|label|type|target
+
+ To put a new app on the desktop, add one line:
+
+     17|My Game|bat|mygame.bat
+     18|Read Me|show|MANUAL.txt
+     19|Open Paint|cmd|start mspaint
+
+ Type "builtin" points at a routine already inside startup.bat. Before it
+ jumps, the shell checks that the routine really exists:
+
+     findstr /r /i /c:"^:%M_TARGET%$" "%~f0" >nul 2>&1
+     if errorlevel 1 goto missing_routine
+
+ That check is there on purpose. A "goto" to a label that does not exist
+ kills a batch script instantly, and that is exactly the bug that used to
+ make the old desktop close after one menu action.
+
+
+-------------------------------------------------------------------------------
+ DEVELOPER MODE
+-------------------------------------------------------------------------------
+
+ Press D on the desktop, type DEV_PASS from starpos.cfg (it starts out as
+ "starp"), and six more items appear on the desktop.
+
+ HOW THE HIDING WORKS. menu.cfg lines take an optional fifth column:
+
+     C|Dev Console|builtin|devconsole|dev
+
+ The desktop skips any line flagged "dev" while DEV_MODE is 0, AND refuses
+ the slot if you type the letter anyway. Both halves matter: without the
+ second one the items would only be invisible, not actually locked. A line
+ with four columns has no flag and always shows, so every menu.cfg written
+ before developer mode existed still behaves the same.
+
+ THE TOOLS
+
+   scan.ps1     Read-only. Never changes a thing. The check worth knowing
+                about reads every .bat, collects the labels it defines, and
+                reports any goto or call aimed at a label that is not there.
+                That single fault is what killed the old startup.bat, and it
+                leaves no error on screen because the window is already gone.
+                It also finds Unix line endings in a .bat, dead menu entries,
+                duplicate config keys, duplicate menu slots, folders with
+                stray characters in their names, and prompts with no escape.
+
+   repair.ps1   Fixes what can be fixed safely. Every file it edits is
+                copied into system\backup with a timestamp first, and if the
+                backup fails it refuses to make the change at all. Run it
+                with -Check to see the list without touching anything, or
+                -Auto to apply everything.
+
+   logedit.ps1  The writable version of logview.ps1. Search, trim to the
+                last N lines, delete one line or every line matching some
+                text, add your own entry, or wipe a stream. Every change
+                asks for YES first and backs the stream up.
+
+   mkapp.ps1    Writes a real working app, not a stub, and registers it in
+                menu.cfg and apps.reg. See the note below about .bat apps.
+
+   install.ps1  Registers something that already exists: a script from
+                anywhere on the disk, an .exe, a folder, a website. It can
+                also hand a package to winget, which is the one thing in
+                starpOS that changes the computer outside its own folder,
+                so that path prints the exact command and waits for YES.
+                Option 5 takes an app back off the desktop by commenting
+                its line out, so putting it back is deleting one #.
+
+ THE .bat APP TRAP
+
+ bootcore.bat runs every .bat in the system folder at boot. That means a new
+ app would also fire during startup, before the desktop appears. Batch apps
+ written by mkapp.ps1 open with:
+
+     if not "%STARPOS_LAUNCH%"=="1" goto :eof
+
+ and startup.bat sets STARPOS_LAUNCH just before it calls an app, clearing
+ it afterwards. If you write a .bat app by hand, copy that line in. This is
+ also why the app builder offers PowerShell first: .ps1 files are not
+ scanned at boot at all, so they never need the guard.
+
+ TURNING IT OFF
+
+ Option 9 in the developer menu locks it again and saves DEV_MODE=0. Option
+ 8 saves DEV_MODE=1 so starpOS boots straight into it. Unlocking from the
+ desktop without saving only lasts for that session.
+
+
+-------------------------------------------------------------------------------
+ THE VOICE SYSTEM
+-------------------------------------------------------------------------------
+
+ Three files, each with one job.
+
+ 1. TO SPEAK ONE LINE, from anywhere:
+
+        cscript //nologo "speak.vbs" "Hello."
+
+    Or through the voice bank, which is what startup.bat does, so the
+    wording lives in one file instead of being scattered through the code:
+
+        call :say APP_NOTEPAD
+
+    and the routine at the bottom of startup.bat is:
+
+        :say
+        if not "%VOICE_ENABLED%"=="1" goto :eof
+        set "_ph="
+        for /f "usebackq eol=# tokens=1,* delims=|" %%A in ("voicebank.txt") do (
+            if /I "%%A"=="%~1" set "_ph=%%B"
+        )
+        if defined _ph cscript //nologo "speak.vbs" "!_ph!"
+        goto :eof
+
+ 2. TO ASK A QUESTION with a pop-up box:
+
+        set "answer="
+        for /f "delims=" %%A in ('cscript //nologo listen.vbs "Your name?"') do set "answer=%%A"
+
+ 3. TO LISTEN FOR SPOKEN COMMANDS:
+
+        powershell -NoProfile -ExecutionPolicy Bypass -File "voice.ps1"
+
+    It builds its speech grammar from voice.cmds, so teaching it a new
+    command is one line in that file:
+
+        open notes|list|..\data\notes|Listing your saved notes.
+
+    If there is no microphone or no recogniser for your language it drops
+    to a typed panel instead of failing. Check what voices you have with:
+
+        powershell -NoProfile -ExecutionPolicy Bypass -File "voice.ps1" -ListVoices
+
+
+-------------------------------------------------------------------------------
+ THINGS TO WATCH OUT FOR
+-------------------------------------------------------------------------------
+
+ * Every path in starpos.cfg is relative to the SYSTEM folder, because that
+   is where the batch files run from. Start starpOS with launcher1.bat so
+   the "cd system" happens first, or ..\data will point somewhere wrong.
+
+ * Do not put spaces around the "=" in starpos.cfg. "OS_NAME = starpOS"
+   would create a variable literally called "OS_NAME " with a trailing space.
+
+ * Do not put quotes around values in starpos.cfg. The set command in the
+   loader adds them.
+
+ * The passwords in users.db are plain readable text. That is fine for a
+   batch OS on your own machine, but never reuse a real password there.
+
+ * Keep these files out of the resources folder. data.bat treats anything
+   executable in there as a security warning (STARP-0205).
+
+ * The kernel scan in bootcore.bat only runs *.bat files, so adding more
+   .txt, .cfg, .db, .reg, .vbs or .ps1 files here is always safe. Adding a
+   new .bat file to this folder means it will be executed at every boot.
+
+ * THE EMPTY PROMPT TRAP. This one is worth knowing about, because the same
+   pattern is still in startup2.bat and in most of the app scripts:
+
+       set /p choice="starpOS> "
+       if "%choice%"=="" goto desktop
+
+   When someone is sitting at the keyboard this is fine, because set /p
+   waits for them. But if starpOS is ever started with its input redirected
+   or closed, set /p cannot read anything, leaves the variable empty, and
+   the script goes round that loop as fast as the machine can manage. A
+   test run of the old shell produced 2.7 MB of screen output in under two
+   minutes doing nothing at all.
+
+   startup.bat v2.0 fixes it by counting blank answers:
+
+       if not defined choice goto blank_input
+       set "BLANKS=0"
+       ...
+       :blank_input
+       set /a BLANKS+=1
+       if !BLANKS! LSS 30 goto desktop
+       goto no_input
+
+   The same guard is on the Settings loop and the Notepad loop. Notepad
+   needed it most: without it, an unreadable prompt appends a blank line to
+   your note file forever.
+
+
+-------------------------------------------------------------------------------
+ GOOD NEXT ADDITIONS
+-------------------------------------------------------------------------------
+
+ * Give startup2.bat the same treatment startup.bat just had: the login
+   portal there still loses every account it creates when the window
+   closes, because new accounts are set as environment variables and never
+   written to users.db. Item 7 further up this file is the one line it
+   needs.
+ * Have the desktop check the logged in role before opening Settings, so
+   the guest account in users.db actually means something.
+ * A real updates.bat that compares version.txt against a file in builds\.
+ * Rewriting main2.py: the to-do list in there does not run yet. Its if and
+   elif lines are missing their colons, choice is compared against the
+   number 1 instead of the string "1", and the remove branch searches the
+   task string instead of the tasks list.
+
+===============================================================================

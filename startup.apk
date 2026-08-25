@@ -1,0 +1,264 @@
+﻿```java
+import java.io.*;
+import java.time.LocalTime;
+import java.util.Scanner;
+
+public class StarpOS {
+
+    private static String osName = "starpOS";
+    private static String osVersion = "1.0.0";
+    private static String logFile1 = null;
+    private static String logFile3 = null;
+
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        
+        while (true) {
+            printDesktop();
+            System.out.print("starpOS> ");
+            String choice = scanner.nextLine();
+
+            // Prompt protection: prevents window from closing if input is blank
+            if (choice.trim().isEmpty()) {
+                continue;
+            }
+
+            // Safe logging output strings using double quotes
+            logInput(choice, logFile1);
+            logInput(choice, logFile3);
+
+            switch (choice) {
+                case "1":
+                    openExplorer();
+                    break;
+                case "2":
+                    openNotepad(scanner);
+                    break;
+                case "3":
+                    showSysInfo();
+                    break;
+                case "4":
+                    openCmd();
+                    break;
+                case "5":
+                    openSettings();
+                    break;
+                case "6":
+                    shutdown();
+                    return;
+                case "7":
+                    launchAI();
+                    break;
+                default:
+                    // Catch invalid inputs smoothly
+                    logWarning(choice, logFile1);
+                    logWarning(choice, logFile3);
+                    break;
+            }
+        }
+    }
+
+    private static void printDesktop() {
+        System.out.println("===============================================================================");
+        System.out.println(" " + osName + " Desktop                                         Logged in as: Admin");
+        System.out.println("===============================================================================");
+        System.out.println();
+        System.out.println("    1. File Explorer      2. Notepad             3. System Info");
+        System.out.println("    4. Command Prompt     5. Settings            6. Shut Down");
+        System.out.println("    7. Launch AI Assistant (ai.bat)");
+        System.out.println();
+        System.out.println("===============================================================================");
+        System.out.println("[START] Type a number (1-7) and press Enter to select an app.");
+        System.out.println("===============================================================================");
+    }
+
+    private static void logInput(String value, String logFile) {
+        if (logFile != null && !logFile.isEmpty()) {
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter(logFile, true))) {
+                writer.write("[" + LocalTime.now() + "] [INP] Value: \"" + value + "\"");
+                writer.newLine();
+            } catch (IOException ignored) {
+            }
+        }
+    }
+
+    private static void logWarning(String command, String logFile) {
+        if (logFile != null && !logFile.isEmpty()) {
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter(logFile, true))) {
+                writer.write("[" + LocalTime.now() + "] [WARNING] Invalid command attempt: \"" + command + "\"");
+                writer.newLine();
+            } catch (IOException ignored) {
+            }
+        }
+    }
+
+    private static void speak(String text) {
+        try {
+            String vbsScript = "CreateObject(\"SAPI.SpVoice\").Speak \"" + text.replace("\"", "\"\"") + "\"";
+            File tempFile = File.createTempFile("talk", ".vbs");
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter(tempFile))) {
+                writer.write(vbsScript);
+            }
+            Process process = Runtime.getRuntime().exec(new String[]{"cscript", "//nologo", tempFile.getAbsolutePath()});
+            process.waitFor();
+            tempFile.delete();
+        } catch (Exception ignored) {
+        }
+    }
+
+    private static void openExplorer() {
+        logAction("Navigated Explorer", logFile1);
+        logAction("Navigated Explorer", logFile3);
+        clearScreen();
+        System.out.println("=== FILE EXPLORER ===");
+        System.out.println();
+        speak("Opening file explorer.");
+        // Simulate dir /b .. (list parent directory)
+        File parentDir = new File(".").getParentFile();
+        if (parentDir != null) {
+            File[] files = parentDir.listFiles();
+            if (files != null) {
+                for (File file : files) {
+                    System.out.println(file.getName());
+                }
+            }
+        }
+        System.out.println();
+        pause();
+    }
+
+    private static void openNotepad(Scanner scanner) {
+        logAction("Opened Notepad", logFile1);
+        logAction("Opened Notepad", logFile3);
+        clearScreen();
+        System.out.println("=== NOTEPAD ===");
+        System.out.println("Type your note below.");
+        System.out.println();
+        speak("Notepad ready.");
+        System.out.print("Text: ");
+        String note = scanner.nextLine();
+        logData(note, logFile1);
+        logData(note, logFile3);
+    }
+
+    private static void showSysInfo() {
+        clearScreen();
+        System.out.println("=== SYSTEM INFORMATION ===");
+        System.out.println("OS Name: " + osName);
+        System.out.println("Version: " + osVersion);
+        System.out.println("Architecture: Java 64-bit Emulation");
+        System.out.println("Status: Running smoother than Windows");
+        System.out.println();
+        speak("Displaying system properties.");
+        pause();
+    }
+
+    private static void openCmd() {
+        logAction("Console Open", logFile1);
+        logAction("Console Open", logFile3);
+        clearScreen();
+        System.out.println("starpOS Terminal Environment. Type 'exit' to return to desktop.");
+        System.out.println();
+        speak("Terminal shell opened.");
+        
+        Scanner cmdScanner = new Scanner(System.in);
+        String line;
+        while ((line = cmdScanner.nextLine()) != null) {
+            if ("exit".equalsIgnoreCase(line.trim())) {
+                break;
+            }
+            System.out.println("Command not found: " + line);
+        }
+        cmdScanner.close();
+    }
+
+    private static void openSettings() {
+        clearScreen();
+        System.out.println("=== SETTINGS ===");
+        System.out.println("1. Matrix Green");
+        System.out.println("2. Classic Blue");
+        speak("Opening configuration panel.");
+        System.out.print("Choice: ");
+        Scanner scanner = new Scanner(System.in);
+        String setchoice = scanner.nextLine();
+        if ("1".equals(setchoice)) {
+            System.out.print("\033[0;32m"); // ANSI Green
+        } else if ("2".equals(setchoice)) {
+            System.out.print("\033[0;34m"); // ANSI Blue
+        }
+    }
+
+    private static void launchAI() {
+        logAction("Executing ai.bat module", logFile1);
+        logAction("Executing ai.bat module", logFile3);
+        clearScreen();
+        
+        File aiBat = new File("ai.bat");
+        if (aiBat.exists()) {
+            try {
+                // Simulate calling ai.bat (note: real execution would require platform-specific handling)
+                System.out.println("Simulating ai.bat execution...");
+            } catch (Exception e) {
+                speak("Error. AI batch module is missing.");
+                System.out.println("[ ERROR ] ai.bat tool missing!");
+                pause();
+            }
+        } else {
+            speak("Error. AI batch module is missing.");
+            System.out.println("[ ERROR ] ai.bat tool missing!");
+            pause();
+        }
+    }
+
+    private static void shutdown() {
+        logAction("Shutdown Terminated", logFile1);
+        logAction("Shutdown Terminated", logFile3);
+        clearScreen();
+        System.out.print("\033[0;31m"); // ANSI Red
+        speak("Shutting down starpOS. Goodbye.");
+        System.out.println("Shutting down " + osName + "...");
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException ignored) {
+        }
+    }
+
+    private static void clearScreen() {
+        try {
+            new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor();
+        } catch (Exception ignored) {
+            // Fallback for non-Windows or when cls fails
+            System.out.print("\033[H\033[2J");
+            System.out.flush();
+        }
+    }
+
+    private static void logAction(String action, String logFile) {
+        if (logFile != null && !logFile.isEmpty()) {
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter(logFile, true))) {
+                writer.write("[" + LocalTime.now() + "] [ACT] " + action);
+                writer.newLine();
+            } catch (IOException ignored) {
+            }
+        }
+    }
+
+    private static void logData(String data, String logFile) {
+        if (logFile != null && !logFile.isEmpty()) {
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter(logFile, true))) {
+                writer.write("[" + LocalTime.now() + "] [DATA] Str: \"" + data.replace("\"", "\"\"") + "\"");
+                writer.newLine();
+            } catch (IOException ignored) {
+            }
+        }
+    }
+
+    private static void pause() {
+        System.out.print("Press Enter to continue...");
+        try {
+            new BufferedReader(new InputStreamReader(System.in)).readLine();
+        } catch (IOException ignored) {
+        }
+    }
+}
+```

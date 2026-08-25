@@ -1,0 +1,98 @@
+# ===========================================================================
+#  apps.reg  -  starpOS application registry
+# ===========================================================================
+#  Every program the OS knows about. bootcore.bat auto-runs every .bat in
+#  the system folder at boot, so this file is the human-readable index of
+#  what those files actually are.
+#
+#  NOTE: this file is the INDEX. The desktop menu is a different file,
+#  menu.cfg. Add an app to menu.cfg to make it appear on the desktop, and
+#  add it here so you can still remember what it was in six months.
+#
+#  FORMAT:  slot|name|file|type|description
+#
+#     slot  = desktop menu number, or - if the app is not on the menu
+#     type  = core     : part of the boot chain, do not launch by hand
+#             app      : normal program the user can open
+#             tool     : utility / diagnostic
+#             lib      : support file, not launchable
+# ===========================================================================
+
+# --- Boot chain (do not launch these directly) ------------------------------
+-|Boot Loader|boot.bat|core|Hardware check, splash screen, hands off to the kernel
+-|Kernel Core|bootcore.bat|core|Sets OS variables, builds folders, scans and runs startup scripts
+-|Desktop Shell|startup.bat|core|The desktop. v2.0, menu driven from menu.cfg
+-|Desktop Shell v2|startup2.bat|core|Older desktop with the login portal
+-|Data Engine|data\data.bat|core|Creates the data, debug, builds and resources folders
+-|Update Stub|updates.bat|core|Empty placeholder the kernel skips on purpose
+
+# --- Desktop applications (slots come from menu.cfg) ------------------------
+1|File Explorer|startup.bat|app|Browse folders, go up with .., launch a file by name
+2|Notepad|startup.bat|app|Multi line notes saved into data\notes
+3|My Notes|startup.bat|app|List and read back everything you have written
+4|System Info|startup.bat|app|The starpOS identity block, read from starpos.cfg
+5|Real Machine Specs|sysinfo.ps1|app|Actual CPU, memory, disks, uptime and graphics
+6|Log Viewer|logview.ps1|app|Reads the three log streams, colours them by tag
+7|Task Manager|startup.bat|app|Live list of running processes
+8|Search Files|startup.bat|app|Finds files by name anywhere under the starpOS root
+9|Calculator|calc.ps1|app|Arithmetic with history and an ans key
+10|Clock|startup.bat|app|Full screen clock, ticks once a second, Q to leave
+11|Command Prompt|startup.bat|app|A real cmd shell, type exit to return
+12|Settings|startup.bat|app|Themes, voice switch, session name, saves to starpos.cfg
+13|AI Assistant|ai.bat|app|Kohaku pattern board, 33 call signs, learns new answers
+13|AI Assistant (native)|ai.exe|app|The same assistant with a real window. Built from ai.cs
+14|Voice Control|voice.ps1|app|Speech recognition driven by voice.cmds
+15|Movie Theater|movies.bat|app|Scans the system folder for .mkv files and plays them
+16|USB Devices|usb.bat|app|Scan, mount and eject external drives
+18|Camera|camera app\camera.ps1|app|Takes real webcam photos into camera app\photos, with a gallery
+H|Help|startup.bat|app|Prints help.txt
+A|About starpOS|startup.bat|app|Logo and version.txt
+X|Shut Down|startup.bat|app|Closes starpOS
+
+# --- Other versions kept around ---------------------------------------------
+-|AI Assistant v2|aiv2.bat|app|Speech engine v3.6
+-|AI Assistant v3|aiv3.bat|app|Speech engine v4.0
+-|Voice Control (batch)|Voice.bat|app|Original batch voice listener
+-|Voice Control (native)|Voice.exe|app|Compiled from Voice.cs
+-|Voice Control v2|voise2.bat|app|Voice input via a pop-up text box
+-|Movie Theater v2|movies2.bat|app|Movie hub, second revision
+
+# --- Developer mode (hidden until unlocked with D on the desktop) -----------
+D|Developer Mode|startup.bat|app|The gate. Asks for DEV_PASS, then opens the dev menu
+C|Dev Console|startup.bat|app|Runs any command you type, nothing filtered
+S|System Scan|scan.ps1|tool|Deep read-only check of every file and every batch jump
+R|Repair Errors|repair.ps1|tool|Finds known faults and fixes them, backing up first
+L|Edit Logs|logedit.ps1|tool|View, search, trim, delete and wipe log streams
+N|New App|mkapp.ps1|tool|Writes a working app from a template and adds it to the menu
+I|Install App|install.ps1|tool|Registers programs, folders, websites and winget packages
+
+# --- Tools ------------------------------------------------------------------
+-|System Info Reporter|sysinfo.ps1|tool|Real machine specifications
+-|Log Viewer|logview.ps1|tool|Also runs alone with -Stream, -Tail, -Filter, -Clear
+-|Calculator|calc.ps1|tool|Also runs alone with -Expression "2+2"
+-|Config Writer|setcfg.ps1|tool|Saves a setting back into starpos.cfg so it sticks
+-|Code Debugger|..\debug\codedebuger.bat|tool|Checks whether each log stream is alive
+
+# --- Voice system -----------------------------------------------------------
+-|Voice Engine|voice.ps1|app|Listens on the mic, falls back to typing
+-|Voice Commands|voice.cmds|lib|Every phrase the engine listens for
+-|Voice Bank|voicebank.txt|lib|Every line starpOS speaks, looked up by ID
+-|Speech Engine|speak.vbs|lib|Speaks one line, call it instead of writing temp VBS
+-|Input Gateway|listen.vbs|lib|Pop-up input box, prints the answer for batch to catch
+
+# --- Support files ----------------------------------------------------------
+-|Call Signs|places.cfg|lib|The two letter codes the AI board is built from
+-|System Config|starpos.cfg|lib|Master settings file
+-|Desktop Menu|menu.cfg|lib|What appears on the desktop and what each item runs
+-|Account Registry|users.db|lib|Usernames, passwords and roles
+-|Boot Banner|logo.txt|lib|ASCII logo, print it with: type logo.txt
+-|Message Of The Day|motd.txt|lib|Desktop welcome text
+-|Help Text|help.txt|lib|In-OS help screen
+-|Error Codes|errors.txt|lib|Every STARP error number and what it means
+-|Version Info|version.txt|lib|Build number and change history
+-|Manual|MANUAL.txt|lib|How the system files fit together
+.com|youtube|start "" "https://www.youtube.com"|app|Opens https://www.youtube.com
+18|app opener|appopener.ps1|app|18
+23|thoryai|thoryai.bat|app|open a 2nd ai esestent
+29|becuse it is here to unistal copys of the destop shell|C:\Users\Scott123\Desktop\starpOS\system\uninstaler.bat|app|pre vershonn of uninstal
+59|202|202.bat|app|202

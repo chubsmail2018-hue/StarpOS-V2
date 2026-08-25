@@ -1,0 +1,13 @@
+-------------------------------------------------------------------------------
+ MESSAGE OF THE DAY
+-------------------------------------------------------------------------------
+ Welcome back to starpOS.
+
+ * The desktop menu takes a number, then Enter.
+ * Everything you type is written to the log streams in the data folder.
+ * Type 'exit' inside the Command Prompt app to come back to the desktop.
+ * Drop .mkv files straight into the system folder for the Movie Theater.
+
+ Tip of the day: run sysinfo.ps1 for the REAL machine specs instead of the
+ fake ones printed by the System Info screen.
+-------------------------------------------------------------------------------

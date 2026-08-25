@@ -1,0 +1,118 @@
+===============================================================================
+                       starpOS ERROR CODE REFERENCE
+===============================================================================
+ Every entry starts at the left edge so a batch file can pull one out with:
+
+    findstr /b "STARP-0301" errors.txt
+
+ Show a whole group (all the boot errors):
+
+    findstr /b "STARP-01" errors.txt
+
+ CODE        MEANING / WHAT TO DO
+===============================================================================
+
+--- 01xx  BOOT ----------------------------------------------------------------
+
+STARP-0101  bootcore.bat is missing. Restore it into the system folder.
+STARP-0102  startup.bat is missing. Restore it into the system folder.
+STARP-0103  Hardware check failed. A required system file was not found.
+STARP-0104  Kernel handover failed. startup.bat ended before the desktop drew.
+            Look for a stray "exit" where it should say "goto desktop".
+STARP-0105  Booted from the wrong folder. Start with launcher1.bat, which does
+            the "cd system" for you, or every ..\ path points somewhere wrong.
+STARP-0106  A .bat file is saved with Unix line endings. goto and call stop
+            finding their labels and the script dies on the first jump.
+            Instant Error Repair converts it back to Windows endings.
+
+--- 02xx  STORAGE -------------------------------------------------------------
+
+STARP-0201  data folder missing. bootcore.bat rebuilds it on the next boot.
+STARP-0202  Log stream unwritable. The folder is read-only, or the path in
+            starpos.cfg does not exist.
+STARP-0203  Data file integrity check failed. Delete "data soreerr v1.3" and
+            let bootcore.bat recreate it.
+STARP-0204  resources folder missing. data.bat rebuilds it on the next boot.
+STARP-0205  Unauthorized .bat file inside resources. Move it to the system
+            folder. Only data files belong in resources.
+STARP-0206  A folder name has stray characters on the end, so the ..
+ame
+            paths in the batch files never find it and quietly make a second
+            folder next to it. Rename it by hand to the plain name.
+STARP-0207  A setting has a space around its = sign. "OS_NAME = starpOS"
+            creates a variable whose name ends in a space, which nothing can
+            then read. Instant Error Repair straightens these out.
+STARP-0208  A setting appears twice in starpos.cfg. The loader runs top to
+            bottom so the last one silently wins.
+
+--- 03xx  ACCOUNTS ------------------------------------------------------------
+
+STARP-0301  Invalid username or password. The default account is Admin / 1234.
+STARP-0302  users.db missing. The login falls back to the built-in Admin.
+STARP-0303  Blank username or password. Both fields are required.
+STARP-0304  That account already exists in users.db. Pick another username.
+STARP-0305  Too many failed attempts. See MAX_LOGIN_TRIES in starpos.cfg.
+STARP-0306  Permission denied for this role. Guests cannot open Settings.
+
+--- 04xx  APPLICATIONS --------------------------------------------------------
+
+STARP-0401  ai.bat missing. Restore it, or point APP_AI in starpos.cfg at a
+            different file.
+STARP-0402  App not listed in apps.reg. Add a line for it.
+STARP-0403  App exited unexpectedly and took the window with it. The app used
+            "exit" where it needed "exit /b".
+STARP-0404  Invalid menu selection. Type only the numbers shown on screen.
+STARP-0405  Two menu.cfg lines claim the same key. The later one wins and the
+            earlier app cannot be reached at all.
+
+--- 05xx  VOICE ---------------------------------------------------------------
+
+STARP-0501  SAPI voice engine unavailable. Windows Speech is not installed or
+            there is no sound device. Set VOICE_ENABLED=0 to run silently.
+STARP-0502  speak.vbs missing. Restore it into the system folder.
+STARP-0503  No microphone detected. Voice.exe falls back to typed commands.
+STARP-0504  Command not recognized. Say only starpOS, Open File or Exit.
+
+--- 06xx  MEDIA ---------------------------------------------------------------
+
+STARP-0601  No .mkv files found. Drop a video into the system folder.
+STARP-0602  Media file vanished mid-launch. It was moved during the scan.
+STARP-0603  No player associated with .mkv. Install a media player first.
+
+--- 07xx  HARDWARE ------------------------------------------------------------
+
+STARP-0701  No removable drive detected. Plug the USB stick in and rescan.
+STARP-0702  Mount failed. That drive letter is already in use.
+STARP-0703  Eject refused. A file on the drive is still open somewhere.
+
+--- 08xx  DEVELOPER MODE ------------------------------------------------------
+
+STARP-0801  You picked a developer tool while developer mode is locked. Press
+            D on the desktop and unlock it first.
+STARP-0802  Wrong developer password. It is DEV_PASS in starpos.cfg, and it
+            starts out as "starp".
+STARP-0803  A repair was refused because the file could not be backed up
+            first. Nothing is ever edited without a copy going into
+            systemackup, so fix the backup folder and try again.
+STARP-0804  That app name has no letters or numbers in it, so there is no
+            file name to build from it.
+STARP-0805  winget is not installed, so Windows software cannot be installed
+            from here. It ships with App Installer from the Microsoft Store.
+
+--- 09xx  CAMERA --------------------------------------------------------------
+
+STARP-0901  No camera found. Plug a webcam in, or look in Device Manager to
+            see whether Windows has lost the built-in one.
+STARP-0902  Windows privacy settings are blocking the camera. Open Settings,
+            Privacy, Camera, and allow desktop apps to use it. Camera
+            Information on the camera menu shows this setting.
+STARP-0903  Nothing on this machine can grab a frame: WinRT refused and
+            ffmpeg is not installed. Use the camera menu option that opens
+            the Windows Camera app instead.
+STARP-0904  The shot itself failed. Usually another program is holding the
+            camera. Close Teams, Zoom, Skype or the Windows Camera app and
+            try again.
+STARP-0905  The Windows Camera app is not installed on this computer. It
+            comes from the Microsoft Store.
+
+===============================================================================

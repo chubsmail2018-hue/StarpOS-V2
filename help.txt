@@ -1,0 +1,103 @@
+===============================================================================
+                            starpOS HELP
+===============================================================================
+
+ STARTING THE SYSTEM
+   launcher1.bat      Normal start. Runs the boot loader.
+   launcher2.bat      Diagnostic start. Runs the kernel core first.
+   The desktop now moves itself into the system folder on startup, so it no
+   longer matters which folder you launch it from.
+
+ THE DESKTOP
+   Type the number or letter next to an app and press Enter. A blank line
+   just redraws the screen, it does not close anything.
+
+     1  File Explorer       Browse folders. Type a folder name to open it,
+                            .. to go up, a file name to launch it, or press
+                            Enter on its own to come back.
+     2  Notepad             Write a note. Type a dot on a line by itself to
+                            save. Notes go into data\notes and stay there.
+     3  My Notes            List and read back everything you have written.
+     4  System Info         The starpOS identity block.
+     5  Real Machine Specs  Actual CPU, memory, disks and uptime.
+     6  Log Viewer          Reads the three log streams, coloured by type.
+     7  Task Manager        Everything running on the machine right now.
+     8  Search Files        Finds files by name anywhere in starpOS.
+     9  Calculator          Sums, with history. 'ans' reuses the last answer.
+    10  Clock               Full screen clock. Press Q to come back.
+    11  Command Prompt      A real shell. Type exit to return.
+    12  Settings            Themes, voice on and off, session name.
+    13  AI Assistant        The speech engine.
+    14  Voice Control       Say commands out loud, or type them.
+    15  Movie Theater       Plays .mkv files dropped in the system folder.
+    16  USB Devices         Scan, mount and eject drives.
+     H  Help                This screen.
+     A  About starpOS       Logo and version history.
+     X  Shut Down           Closes starpOS.
+
+ DEVELOPER MODE
+   Press D on the desktop and type the developer password. It starts out as
+   "starp" and lives in starpos.cfg as DEV_PASS, so change it if you like.
+
+   Unlocking adds six more items to the desktop:
+
+     C  Dev Console      Runs any command you type. Nothing is filtered and
+                         everything is written to the log.
+     S  System Scan      Reads every file in starpOS and reports what is
+                         wrong. It only looks, it never changes anything.
+     R  Repair Errors    Fixes what the scan found, where a fix is safe.
+                         Anything it edits is copied into system\backup
+                         first, so a repair can always be undone.
+     L  Edit Logs        Search, trim, delete lines, or wipe a stream.
+     N  New App          Writes a working app and puts it on the desktop.
+     I  Install App      Adds a program, folder or website to the desktop,
+                         or installs Windows software through winget.
+
+   The developer menu itself also has "remember for next boot" and "lock
+   again". Locking hides the six items and refuses them even if you type
+   the letter, so nothing is only pretending to be hidden.
+
+   Unlocking is a speed bump, not a lock. Anyone who can open starpos.cfg
+   in Notepad can read the password. That is fine for keeping the repair
+   and log tools out of the way during a normal session, which is all it
+   is meant to do.
+
+ ADDING YOUR OWN APP TO THE DESKTOP
+   Open menu.cfg in Notepad and add a line like this:
+
+     17|My Game|bat|mygame.bat
+
+   Save it and restart starpOS. That is the whole job, there is no batch
+   code to write. Put a # at the front of a line to hide an app instead of
+   deleting it.
+
+ MAKING SETTINGS STICK
+   Change a theme in Settings, then pick "Save this look as the default".
+   It writes into starpos.cfg, so it is still set the next time you boot.
+
+ VOICE
+   Voice Control listens for the phrases listed in voice.cmds. Add a line
+   there to teach it a new command. Everything starpOS says out loud comes
+   from voicebank.txt, so change the wording there and the whole OS changes
+   with it. Settings has a switch to turn voice off completely.
+
+ ACCOUNTS
+   The default account is Admin with the password 1234.
+   Accounts live in users.db. Roles are admin, user and guest.
+
+ WHERE THINGS ARE
+   system/            Every program and system file
+   system/backup/     The previous version of the desktop shell
+   system/System32/   Windows library snapshot, leave it alone
+   data/              1.log kernel, 2.log system, 3.log user activity
+   data/notes/        Notes written in Notepad
+   debug/             codedebuger.bat, checks the log streams
+   builds/            Update packages
+   resources/         Data files only. Never put .bat files here
+
+ WHEN SOMETHING BREAKS
+   Look up the STARP-#### number in errors.txt.
+   Open the Log Viewer and read the last few lines of stream 1.
+   Run Real Machine Specs to check the folders are all present.
+
+===============================================================================

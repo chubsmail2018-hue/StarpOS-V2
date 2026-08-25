@@ -1,0 +1,62 @@
+# ===========================================================================
+#  voicebank.txt  -  every line starpOS speaks, in one place
+# ===========================================================================
+#  Instead of burying spoken text inside each batch file, scripts look the
+#  phrase up by ID. Change the wording here and the whole OS changes with it.
+#
+#  FORMAT:  ID|the words to speak
+#
+#  Speak one from batch (startup.bat has this as its :say routine):
+#
+#     set "_ph="
+#     for /f "usebackq eol=# tokens=1,* delims=|" %%A in ("voicebank.txt") do (
+#         if /I "%%A"=="DESK_WELCOME" set "_ph=%%B"
+#     )
+#     if defined _ph cscript //nologo "speak.vbs" "%_ph%"
+#
+#  Spell tricky words the way they should SOUND, not the way they are
+#  written. "starp O S" reads better out loud than "starpOS".
+# ===========================================================================
+
+# --- Boot -------------------------------------------------------------------
+BOOT_START|Initializing starp O S hardware check.
+BOOT_OK|Hardware verification successful. Loading kernel structures.
+BOOT_FAIL|Boot failure. A required system file is missing.
+BOOT_DONE|starp O S is ready.
+
+# --- Desktop ----------------------------------------------------------------
+DESK_WELCOME|Welcome to starp O S. Select an application.
+DESK_BACK|Returning to the desktop.
+DESK_BADCMD|That is not a valid selection. Please try again.
+
+# --- Applications -----------------------------------------------------------
+APP_EXPLORER|Opening file explorer.
+APP_NOTEPAD|Notepad ready. Type your note.
+APP_NOTESAVED|Your note has been saved.
+APP_SYSINFO|Displaying system properties.
+APP_REALINFO|Reading the real machine specifications. This takes a moment.
+APP_SHELL|Terminal shell opened. Type exit to come back.
+APP_SETTINGS|Opening the configuration panel.
+APP_TASKS|Listing every running process.
+APP_LOGS|Opening the system log viewer.
+APP_CALC|Calculator ready. Type a sum.
+APP_HELP|Opening the help screen.
+APP_SEARCH|Searching for your file now.
+APP_AI|Starting the A I assistant.
+APP_VOICE|Starting voice control.
+APP_MOVIES|Opening the movie theater.
+APP_USB|Opening the U S B device controller.
+
+# --- Settings ---------------------------------------------------------------
+SET_SAVED|Your settings have been saved and will be remembered next boot.
+SET_THEME|Theme changed.
+SET_VOICEOFF|Voice output is now switched off.
+SET_VOICEON|Voice output is now switched on.
+
+# --- Errors -----------------------------------------------------------------
+ERR_MISSING|Error. That program is missing from the system folder.
+ERR_NOFILE|Error. No matching file was found.
+ERR_DENIED|Access denied. Your account does not have permission for that.
+
+# --- Shutdown ---------------------------------------------------------------
+PWR_DOWN|Shutting down starp O S. Goodbye.

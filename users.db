@@ -1,0 +1,29 @@
+# ===========================================================================
+#  users.db  -  starpOS account registry
+# ===========================================================================
+#  FORMAT (one account per line, pipe separated, no spaces around the pipes):
+#
+#     username|password|role|theme|display name
+#
+#  ROLES:  admin  = full access, can reach Settings and Task Manager
+#          user   = normal desktop access
+#          guest  = desktop only, no Settings, nothing is saved
+#
+#  Look an account up from batch:
+#
+#     for /f "usebackq eol=# tokens=1,2,3 delims=|" %%A in ("users.db") do (
+#         if /I "%%A"=="%input_user%" if "%%B"=="%input_pass%" set "OS_ROLE=%%C"
+#     )
+#
+#  Add a new account from batch:
+#
+#     echo newname^|newpass^|user^|1F^|New Name>>"users.db"
+#
+#  WARNING: these passwords are stored as plain readable text. That is fine
+#  for a batch-file OS you run yourself, but never put a password here that
+#  you actually use anywhere else.
+# ===========================================================================
+
+Admin|1234|admin|1F|System Administrator
+Scott|starp|admin|0A|Scott
+Guest|guest|guest|0B|Guest Session

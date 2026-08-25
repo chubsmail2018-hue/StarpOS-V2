@@ -1,0 +1,83 @@
+starpOS
+===============================================================================
+ Product      : starpOS
+ Version      : 1.5.0
+ Codename     : Northstar
+ Build        : 2026.08.21
+ Channel      : stable
+ Architecture : Batch 64-bit Emulation
+ Developer    : ScottSoft Team
+ Kernel       : bootcore.bat
+ Shell        : startup.bat v2.0
+===============================================================================
+
+ COMPONENT VERSIONS
+   Boot Loader ............ boot.bat            1.0
+   Kernel Core ............ bootcore.bat        1.0.0
+   Desktop Shell .......... startup.bat         2.0
+   Login Shell ............ startup2.bat        2.0
+   Data Engine ............ data\data.bat       1.3
+   Voice Engine ........... voice.ps1           1.0
+   Speech Output .......... speak.vbs           1.0
+   Input Gateway .......... listen.vbs          1.0
+   System Reporter ........ sysinfo.ps1         1.0
+   Log Viewer ............. logview.ps1         1.0
+   Calculator ............. calc.ps1            1.0
+   Config Writer .......... setcfg.ps1          1.0
+   AI Engine .............. ai.bat              6.0
+   AI Engine (native) ..... ai.exe              6.0
+   AI Engine v2 ........... aiv2.bat            3.6
+   AI Engine v3 ........... aiv3.bat            4.0
+   Voice Engine (batch) ... Voice.bat           1.0
+   Voice Engine (native) .. Voice.exe           1.0
+   Movie Theater .......... movies.bat          1.0
+   USB Controller ......... usb.bat             1.0
+   Code Debugger .......... codedebuger.bat     1.0
+   System Scanner ......... scan.ps1            1.0
+   Error Repair ........... repair.ps1          1.0
+   Log Editor ............. logedit.ps1         1.0
+   App Builder ............ mkapp.ps1           1.0
+   App Installer .......... install.ps1         1.0
+
+ HISTORY
+   1.5.0  Developer mode. Press D on the desktop and unlock with DEV_PASS to
+          reveal six extra desktop items and the developer menu.
+          Dev Console runs any command typed, with nothing filtered.
+          Advanced System Scan reads every batch file and reports a goto or
+          call aimed at a label that does not exist, Unix line endings, dead
+          menu entries, duplicate config keys and prompts with no escape.
+          Instant Error Repair fixes what it can, backing up into
+          systemackup before it touches anything.
+          Log Editor can search, trim, delete lines and wipe a stream.
+          App Builder writes a working .ps1 or .bat app and puts it on the
+          desktop. Batch apps carry a guard so bootcore.bat does not run
+          them during startup.
+          App Installer registers files, folders, websites and winget
+          packages, and can take an app back off the desktop.
+          menu.cfg gained a fifth column: dev hides a line until developer
+          mode is unlocked. Four-column lines still work unchanged.
+   1.4.0  Desktop shell rewritten as v2.0.
+          FIXED: startup.bat called "goto desktop" nine times but the
+          :desktop label did not exist, so the shell died after a single
+          menu action. That was the reason the window kept closing.
+          FIXED: an empty prompt sent the shell round its own loop with no
+          way out. Every prompt now counts blank answers and stops.
+          The desktop menu is now built from menu.cfg, so apps can be added
+          without editing any batch code.
+          Settings save into starpos.cfg through setcfg.ps1, so a theme now
+          survives a reboot instead of lasting until the window closes.
+          New apps: My Notes, Log Viewer, Search, Calculator, Clock,
+          Task Manager, Real Machine Specs, Help, About.
+          New voice system: voice.ps1 with real speech recognition driven
+          by voice.cmds, spoken lines collected in voicebank.txt, and
+          listen.vbs as a reusable input box.
+          The old shell is kept at backup\startup.bat
+   1.3.0  Added the system file set: starpos.cfg, users.db, apps.reg,
+          errors.txt, help.txt, logo.txt, motd.txt, speak.vbs, sysinfo.ps1.
+          Settings now live in one config file instead of being hard-coded.
+   1.2.0  Login portal, task manager and re-login added in startup2.bat.
+          Voice.cs compiled to Voice.exe as a native voice engine.
+   1.1.0  Movie theater, USB controller and the AI speech engines.
+   1.0.0  First boot. boot.bat, bootcore.bat, startup.bat and the
+          three-stream logging system.
+===============================================================================
